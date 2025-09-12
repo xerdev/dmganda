@@ -1,10 +1,9 @@
-const express = require('express');
-const axios = require('axios');
+const express = require('express')
+const axios = require('axios')
 
-const app = express();
-const PORT = process.env.PORT || 3000; // Gunakan port dari environment atau default 3000
+const app = express()
+const PORT = process.env.PORT || 3000
 
-// Konstanta dan fungsi helper
 const countryMap = {
     "AF": "Afghanistan 🇦🇫", "AL": "Albania 🇦🇱", "DZ": "Aljazair 🇩🇿", "AD": "Andorra 🇦🇩", "AO": "Angola 🇦🇴",
     "AR": "Argentina 🇦🇷", "AM": "Armenia 🇦🇲", "AU": "Australia 🇦🇺", "AT": "Austria 🇦🇹", "AZ": "Azerbaijan 🇦🇿",
@@ -31,7 +30,7 @@ const countryMap = {
     "TH": "Thailand 🇹🇭", "TR": "Turki 🇹🇷", "UA": "Ukraina 🇺🇦", "AE": "Uni Emirat Arab 🇦🇪", "GB": "Inggris 🇬🇧",
     "US": "Amerika Serikat 🇺🇸", "UZ": "Uzbekistan 🇺🇿", "VE": "Venezuela 🇻🇪", "VN": "Vietnam 🇻🇳", "YE": "Yaman 🇾🇪",
     "ZW": "Zimbabwe 🇿🇼"
-};
+}
 
 async function stalkml(uid, server) {
     try {
@@ -57,15 +56,15 @@ async function stalkml(uid, server) {
                 'Origin': 'https://moogold.com/product/mobile-legends/',
                 'Referer': 'https://moogold.com/product/mobile-legends/'
             }
-        });
+        })
 
-        const message = response.data.message;
+        const message = response.data.message
         if (!message || typeof message !== 'string') {
-            throw new Error('Format respons tidak valid dari MooGold');
+            throw new Error('Format respons tidak valid dari MooGold')
         }
 
-        const lines = message.split('\n').map(line => line.trim());
-        const countryCode = lines[3]?.split(': ')[1] || null;
+        const lines = message.split('\n').map(line => line.trim())
+        const countryCode = lines[3]?.split(': ')[1] || null
 
         return {
             userID: lines[0]?.split(': ')[1] || null,
@@ -73,39 +72,35 @@ async function stalkml(uid, server) {
             nickname: lines[2]?.split(': ')[1] || null,
             country: countryCode,
             negara: countryMap[countryCode] || countryCode
-        };
+        }
     } catch (error) {
-        // Lemparkan error agar bisa ditangkap di block catch selanjutnya
-        throw new Error('Gagal mengambil data nickname: ' + error.message);
+        throw new Error('Gagal mengambil data nickname: ' + error.message)
     }
 }
 
-// Endpoint API
 app.get('/cekml', async (req, res) => {
-    const { id, server } = req.query;
+    const { id, server } = req.query
 
     if (!id || !server) {
         return res.status(400).json({
             status: false,
             creator: 'Firman Evergarden ^_^',
             message: 'Parameter "id" dan "server" dibutuhkan'
-        });
+        })
     }
 
     try {
-        // 1. Dapatkan data nickname dan negara dari moogold
-        const cekId = await stalkml(id, server);
+        const cekId = await stalkml(id, server)
         if (!cekId.nickname) {
-             return res.status(404).json({
+            return res.status(404).json({
                 status: false,
                 creator: 'Firman Evergarden ^_^',
                 message: 'User ID atau Server ID tidak ditemukan.'
-            });
+            })
         }
 
-        // 2. Dapatkan data double recharge dari mobapay
-        const mobaPayResponse = await axios.get(`https://api.mobapay.com/api/app_shop?app_id=100000&game_user_key=${id}&game_server_key=${server}&country=${cekId.country}&language=en&network=&net=&coupon_id=&shop_id=`);
-        const mobaPayData = mobaPayResponse.data.data.shop_info.shelf_location[0].goods;
+        const mobaPayResponse = await axios.get(`https://api.mobapay.com/api/app_shop?app_id=100000&game_user_key=${id}&game_server_key=${server}&country=${cekId.country}&language=en&network=&net=&coupon_id=&shop_id=`)
+        const mobaPayData = mobaPayResponse.data.data.shop_info.shelf_location[0].goods
 
         const resultData = {
             id: id,
@@ -119,26 +114,65 @@ app.get('/cekml', async (req, res) => {
                 '250+250': mobaPayData[2]?.goods_limit.reached_limit,
                 '500+500': mobaPayData[3]?.goods_limit.reached_limit
             }
-        };
+        }
 
-        // 3. Kirim hasil akhir sesuai format yang diminta
         res.status(200).json({
             status: true,
             creator: 'Firman Evergarden ^_^',
             data: resultData
-        });
-
+        })
     } catch (error) {
-        console.error(error); // Log error untuk debugging di server
+        console.error(error)
         res.status(500).json({
             status: false,
             creator: 'Firman Evergarden ^_^',
             message: error.message || 'Terjadi kesalahan pada server'
-        });
+        })
     }
-});
+})
 
-// Jalankan server
+app.get('/cekmcgg', async (req, res) => {
+    const { id, server } = req.query
+
+    if (!id || !server) {
+        return res.status(400).json({
+            status: false,
+            creator: 'Firman Evergarden ^_^',
+            message: 'Parameter "id" dan "server" dibutuhkan'
+        })
+    }
+
+    try {
+        const anu = await axios.get(`https://api.mobapay.com/api/app_shop?app_id=124526&game_user_key=${id}&game_server_key=${server}&country=ID&language=en&network=&net=&coupon_id=&shop_id=`)
+        const result = anu.data
+        const mc = result.data.shop_info.shelf_location[0].goods
+
+        const dm = {
+            '50+50': mc[0].goods_limit.reached_limit,
+            '150+150': mc[1].goods_limit.reached_limit,
+            '250+250': mc[2].goods_limit.reached_limit,
+            '500+500': mc[3].goods_limit.reached_limit,
+            'weekly_card': result.data.shop_info.good_list[0].goods_limit.reached_limit
+        }
+
+        res.status(200).json({
+            status: true,
+            creator: 'Firman Evergarden ^_^',
+            data: {
+                username: result.data.user_info.user_name,
+                limit_reached: dm
+            }
+        })
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({
+            status: false,
+            creator: 'Firman Evergarden ^_^',
+            message: error.message || 'Terjadi kesalahan pada server'
+        })
+    }
+})
+
 app.listen(PORT, () => {
-    console.log(`Server berjalan di http://localhost:${PORT}`);
-});
+    console.log(`Server berjalan di http://localhost:${PORT}`)
+})
