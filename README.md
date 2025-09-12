@@ -1,54 +1,59 @@
 # API Cek Ganda & Nickname Mobile Legends
 
-Selamat datang di dokumentasi resmi API Cek Ganda & Nickname Mobile Legends. API ini memungkinkan Anda untuk dengan mudah memeriksa nama panggilan (nickname) dan status *double recharge* dari akun Mobile Legends berdasarkan ID Pengguna dan ID Server.
+Selamat datang di dokumentasi resmi **API Cek Ganda & Nickname Mobile Legends**.  
+API ini memungkinkan Anda untuk:
+
+- Mengecek **nickname** akun Mobile Legends.  
+- Melihat status **double recharge** (apakah masih tersedia atau sudah limit).  
+- Mengecek **Magic Chess** recharge & weekly card.  
 
 API ini di-host di Vercel dan dapat diakses secara publik.
 
-**Base URL**: `https://mann-cekganda.vercel.app`
+**Base URL**: `https://mann-stalker.vercel.app`
 
-## Endpoint Utama
+---
 
-Satu-satunya endpoint yang tersedia saat ini adalah untuk melakukan pengecekan data akun.
+## Endpoint
 
-### Cek Akun ML
+### 1. Cek Akun Mobile Legends
+Cek nickname dan status double recharge akun Mobile Legends.
 
-Untuk mendapatkan detail akun, kirimkan permintaan GET ke endpoint berikut:
+- **Method**: `GET`  
+- **Endpoint**: `/cekml`  
 
-* **Method**: `GET`
-* **Endpoint**: `/cekml`
-
-#### Parameter Kueri (Query Parameters)
+#### Parameter
 
 | Parameter | Tipe   | Deskripsi                              | Wajib? |
-| :-------- | :----- | :--------------------------------------- | :----- |
-| `id`      | String | ID Pengguna dari akun Mobile Legends.    | Ya     |
-| `server`  | String | ID Server dari akun Mobile Legends.      | Ya     |
+|-----------|--------|----------------------------------------|--------|
+| `id`      | String | ID Pengguna dari akun Mobile Legends   | Ya     |
+| `server`  | String | ID Server dari akun Mobile Legends     | Ya     |
 
-## Contoh Penggunaan
+#### Contoh Request
+https://mann-stalker.vercel.app/cekml?id=283916287&server=9476
 
-Berikut adalah cara menggunakan API ini melalui URL langsung atau `curl`.
+---
 
-#### 1. Melalui URL Browser
+### 2. Cek Akun Magic Chess
+Cek username, limit double recharge, dan weekly card pada Magic Chess.
 
-Anda bisa langsung mengakses URL berikut di browser Anda:
+- **Method**: `GET`  
+- **Endpoint**: `/getmcgg`  
 
-`https://mann-cekganda.vercel.app/cekml?id=283916287&server=9476`
+#### Parameter
 
-#### 2. Menggunakan cURL
+| Parameter | Tipe   | Deskripsi                              | Wajib? |
+|-----------|--------|----------------------------------------|--------|
+| `id`      | String | ID Pengguna dari akun Magic Chess      | Ya     |
+| `server`  | String | ID Server dari akun Magic Chess        | Ya     |
 
-Anda juga dapat menggunakan `curl` di terminal atau command prompt:
+#### Contoh Request
+https://mann-stalker.vercel.app/cekmcgg?id=6578420&server=4149
 
-`curl -X GET "https://mann-cekganda.vercel.app/cekml?id=283916287&server=9476"`
+---
 
 ## Contoh Respons
 
-Berikut adalah contoh respons yang akan Anda terima dari API.
-
-#### ✅ Respons Sukses (200 OK)
-
-Jika ID dan Server valid dan ditemukan, Anda akan menerima respons seperti ini:
-
-```json
+### ✅ Respons Sukses (ML Biasa)
 {
     "status": true,
     "creator": "Firman Evergarden ^_^",
@@ -66,3 +71,26 @@ Jika ID dan Server valid dan ditemukan, Anda akan menerima respons seperti ini:
         }
     }
 }
+
+### ✅ Respons Sukses (Magic Chess)
+{
+    "status": true,
+    "creator": "Firman Evergarden ^_^",
+    "data": {
+        "username": "FE Magic Chess",
+        "limit_reached": {
+            "50+50": false,
+            "150+150": true,
+            "250+250": false,
+            "500+500": false,
+            "weekly_card": false
+        }
+    }
+}
+
+---
+
+## Catatan
+- Jika parameter `id` atau `server` kosong → respons `400 Bad Request`.  
+- Jika akun tidak ditemukan → respons `404 Not Found`.  
+- Jika server error / gagal request → respons `500 Internal Server Error`.  
