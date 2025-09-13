@@ -99,7 +99,7 @@ app.get('/cekml', async (req, res) => {
             })
         }
 
-        const mobaPayResponse = await axios.get(`https://api.mobapay.com/api/app_shop?app_id=100000&game_user_key=${id}&game_server_key=${server}&country=${cekId.country}&language=en&network=&net=&coupon_id=&shop_id=`)
+        const mobaPayResponse = await axios.get(`https://api.mobapay.com/api/app_shop?app_id=100000&game_user_key=${id}&game_server_key=${server}&country=ID&language=en&network=&net=&coupon_id=&shop_id=`)
         const mobaPayData = mobaPayResponse.data.data.shop_info.shelf_location[0].goods
 
         const resultData = {
@@ -176,3 +176,4 @@ app.get('/cekmcgg', async (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server berjalan di http://localhost:${PORT}`)
 })
+
